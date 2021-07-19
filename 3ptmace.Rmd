@@ -1,0 +1,386 @@
+---
+title: "3ptmace"
+author: "Salil V Deo"
+date: "7/14/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Markdown file to obtain curves for 3 pt mace and then pool results.
+Plan to pool at 1,3 & 5 years from randomisation.
+
+```{r get libraries}
+
+library(easypackages)
+libraries(c("tidyverse","IPDfromKM",'survival','survminer',
+            "survRM2","surv2sampleComp","Temporal",
+            "flexsurv","broom","rstpm2", "survHE","brms",
+            "rstanarm"))
+
+```
+
+## Extract data from each trial - 
+
+### ELIXA - lixisenatide vs control 
+
+```{r ELIXA get data}
+
+
+# for lixisenatide 
+
+nrisk_l <- c(3034, 2785, 1558, 484)
+
+trisk_l <- c(0,1,2,3.4)
+
+lix <- read.table("F:\\GLP1_agonists\\data\\elixa\\3pmace_lixisenatide.txt")
+
+lix$V2 <- abs(lix$V2)
+
+lix <- lix %>% arrange(V1, V2)
+
+# y axis data needs to be as KM plot not cumulative event plot.
+# reformat this if needed.
+
+
+lix$V2 <- 100 - lix$V2
+
+summary(lix)
+
+res_lix <- preprocess(dat = lix,
+           trisk = trisk_l,
+           nrisk = nrisk_l,
+           maxy = 100)
+
+
+
+
+elixa_ipd_lix <- getIPD(prep = res_lix,
+                     armID = 1)
+
+
+summary(elixa_ipd_lix)
+
+plot(elixa_ipd_lix)
+
+
+df_elixa_lix <- elixa_ipd_lix$IPD
+
+
+# for control 
+
+nrisk_c <- c(3034,2759,1566,476)
+
+trisk_c <- c(0,1,2,3.4)
+
+control <- read.table("F:\\GLP1_agonists\\data\\elixa\\3pmace_control.txt")
+
+
+control$V2 <- 100 - control$V2
+
+elixa_control <- preprocess(dat = control,
+           trisk = trisk_c,
+           nrisk = nrisk_c,
+           maxy = 100)
+
+
+elixa_ipd_control <- getIPD(prep = elixa_control,
+                     armID = 0)
+
+df_elixa_control <- elixa_ipd_control$IPD
+
+# combine both df 
+
+elixa_df <- rbind(df_elixa_control, df_elixa_lix)
+
+
+
+
+# create survival obj and then plot.
+
+elixa_plot <- survfit(Surv(time, status) ~ factor(treat), data = elixa_df)
+
+
+# create plot 
+
+ggsurvplot(elixa_plot, fun = "event",
+           data = elixa_df, censor.size = 0)
+
+
+```
+
+```{r ELIXA, echo=FALSE,warning=FALSE,message=FALSE}
+
+# fit parametric model and then obtain 1, 3, 5 year RMST difference values 
+# value + se 
+
+
+mods <- c("exp","wei","gamma")
+
+# treat is the factor variable.
+
+formula = Surv(time, status) ~ factor(treat)
+
+model <- fit.models(formula = formula,
+                    data = elixa_df,
+                    distr = mods)
+
+# obtain model estimates for AIC and BIC 
+
+
+
+tibble(models = model$misc$model_name,
+         AIC = model$model.fitting$aic,
+       BIC = model$model.fitting$bic)
+
+# weibull model fits best for the data.
+# now to obtain the RMST difference at 1, 3, 5 years using this model data.
+
+```
+
+
+```{r get RMST diff using weibull for ELIXA}
+
+elixa_3ptmace_res <- compParaSurv(time = elixa_df$time,
+                    status = elixa_df$status,
+                    arm = elixa_df$treat,
+                    tau = c(1,3,5),
+                    dist1 = "weibull",
+                    dist0 = "weibull",
+                    boot = 1000)
+
+```
+
+```{r}
+
+
+elixa_res <- elixa_3ptmace_res@RMST
+
+elixa <- elixa_res %>% select(Tau, Contrast, Point, SE, L.boot, U.boot,P)
+
+elixa
+
+
+```
+
+### EXCSEL 
+
+```{r}
+
+
+
+
+# for exenatide
+
+nrisk_e <- c(7356, 7101, 6893, 6580, 5912, 4475, 3595, 3053, 2281, 1417, 727)
+
+trisk_e <- c(0,0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5)
+
+exe <- read.table("F:\\GLP1_agonists\\data\\excsel\\3ptmace_exenatide.txt")
+
+
+# y axis data needs to be as KM plot not cumulative event plot.
+# reformat this if needed.
+
+exe$V2 <- 100 - exe$V2
+
+summary(exe)
+
+res_exe <- preprocess(dat = exe,
+           trisk = trisk_e,
+           nrisk = nrisk_e,
+           maxy = 100)
+
+
+
+
+excsel_ipd_exe <- getIPD(prep = res_exe,
+                     armID = 1)
+
+
+summary(excsel_ipd_exe)
+
+plot(excsel_ipd_exe)
+
+
+df_excsel_exe <- excsel_ipd_exe$IPD
+
+
+# for control 
+
+nrisk_c <- c(7396, 7120, 6897, 6565, 5908, 4468, 3365, 2961, 2209, 1366, 687)
+
+trisk_c <- c(0,0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5)
+
+control <- read.table("F:\\GLP1_agonists\\data\\excsel\\3ptmace_control.txt")
+
+
+control$V2 <- 100 - control$V2
+
+excsel_control <- preprocess(dat = control,
+           trisk = trisk_c,
+           nrisk = nrisk_c,
+           maxy = 100)
+
+
+excsel_ipd_control <- getIPD(prep = excsel_control,
+                     armID = 0)
+
+df_excsel_control <- excsel_ipd_control$IPD
+
+# combine both df 
+
+excsel_df <- rbind(df_excsel_control, df_excsel_exe)
+
+
+
+
+# create survival obj and then plot.
+
+excsel_plot <- survfit(Surv(time, status) ~ factor(treat), data = excsel_df)
+
+
+# create plot 
+
+ggsurvplot(excsel_plot, fun = "event",
+           data = excsel_df, censor.size = 0)
+
+
+```
+
+
+```{r EXCSEL, echo=FALSE,warning=FALSE,message=FALSE}
+
+# fit parametric model and then obtain 1, 3, 5 year RMST difference values 
+# value + se 
+
+
+mods <- c("exp","wei","gamma")
+
+# treat is the factor variable.
+
+formula = Surv(time, status) ~ factor(treat)
+
+model <- fit.models(formula = formula,
+                    data = excsel_df,
+                    distr = mods)
+
+# obtain model estimates for AIC and BIC 
+
+
+
+tibble(models = model$misc$model_name,
+         AIC = model$model.fitting$aic,
+       BIC = model$model.fitting$bic)
+
+# gamma model fits best for the data.
+# now to obtain the RMST difference at 1, 3, 5 years using this model data
+
+```
+
+```{r get RMST diff using weibull for EXCSEL}
+
+
+
+exscel_3ptmace_res <- compParaSurv(time = excsel_df$time,
+                    status = excsel_df$status,
+                    arm = excsel_df$treat,
+                    tau = c(1,3,5),
+                    dist1 = "weibull",
+                    dist0 = "weibull",
+                    boot = 1000,
+                    )
+
+```
+
+
+get estimates for rmst diff - 
+
+```{r}
+
+
+excsel_res <- exscel_3ptmace_res@RMST
+
+excsel <- excsel_res %>% select(Tau, Contrast, Point, SE, L.boot, U.boot,P)
+
+excsel
+
+```
+
+
+```{r}
+
+library(brms)
+
+```
+
+```{r}
+
+priors <- c(prior(normal(0,1), class = Intercept),
+            prior(cauchy(0, 0.5), class = sd))
+
+
+df <- data.frame(study = c('elixa','excel'),
+             TE = c(-0.01501, 0.02845),
+             seTE = c(0.04384, 0.02017))
+
+
+
+library(baggr)
+
+
+df_pooled <- data.frame("tau" = c(28,8,-3,7,-1,1,18,12),
+                        "se"  = c(15,10,16,11,9,11,10,18))
+
+
+df <- data.frame(study = c('elixa','excel'),"tau" =  c(-0.01501, 0.02845),
+                 "se" = c(0.04384, 0.02017))
+
+bg <- baggr(df, pooling = "partial",effect = "mean")
+
+summary(bg)
+
+bg
+
+forest_plot(bg, show = "both",
+            print = "inputs")
+
+
+```
+
+
+```{r}
+
+m <- brm(TE|se(seTE) ~ 1 + (1|study),
+         data = df,
+        # prior = priors,
+         iter = 100)
+
+```
+
+```{r}
+
+m <- brm(TE|se(seTE) ~ 1 + (1|study),
+         data = df,
+        # prior = priors,
+         iter = 100)
+
+
+```
+
+
+
+```{r}
+
+library(rstanarm)
+
+stan_lmer(formula = TE ~ 1 + (1|study),
+          data = df,
+          seed = 1974)
+
+
+
+```
+

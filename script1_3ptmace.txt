@@ -1,0 +1,9 @@
+Study: Pooled analysis of d-RMST for GLP1 agonists
+
+This script contains code to extract IPD data from the curves for 3pt MACE
+Create a combined dataset and then save it to this folder.
+
+library(easypackages)
+libraries(c("tidyverse","IPDfromKM",'survival',
+    "survRMST","flexsurv","broom","rstpm2",))
+    
