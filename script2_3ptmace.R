@@ -63,21 +63,95 @@ df$Arm <- df$treat
 
 df2 <- df %>% select(trialID, Time, Event, Arm)
 
+# run the model metaRMST using df and time @ 12, 24, 36, 48 and 
+# fit the univariate model using integration of the KM curves.
+
+res_uni <- metaRMSTD(df2, 
+        time_horizons = c(12,24,36,48),
+        MA_method ="uni")
+
+res_uni
+
+result_univ_km <- tbl_df(res_uni$result)
+
+result_univ_km
+
+result_km <- result_univ_km %>% select(time_horizon,
+                                       
+                                       Estimate,
+                                       upper,
+                                       lower,
+                                       pval)
+
+result_km
+
+
+
 # run the model metaRMST using df and time @ 12,24,36,48 fitting
 # the flexible RP model and with extrapolation of curves.
 
-res <- metaRMSTD(df2, 
-                 time_horizons = c(12,24,36,48),
+
+res <- metaRMSTD(df2,time_horizons = c(12,24,36,48),
                  MA_method ="uni_flex")
 
 df_res <- tbl_df(res$result)
 
-result <- df_res %>% select(time_horizon,Estimate,lower, upper, pval)
+result_flex <- df_res %>% select(time_horizon,Estimate,lower, upper, pval)
 
-result
+result_flex
+
+result_flex$method <- 'parametric_model'
+result_km$method <- 'KM integration'
+
+
+result_comb <- rbind(result_flex, result_km)
+
+
+# create a plot to compare both estimates.
+# save this plot and going to include in the supplemental section.
+
+t <- ggplot(data = result_comb) + 
+  geom_point(aes(x = time_horizon,
+                 y = Estimate,
+                 group = method,
+                 color = method),
+size = 2, position = position_dodge2(width = 3),
+shape = "square") 
+
+t2 = t +
+  geom_linerange(aes( x = time_horizon,
+                      ymin = lower,
+                      ymax = upper,
+                      group = method,
+                      color = method),
+                 position = position_dodge2(width = 3))
+
+t2
+
+
+t3 <- t2 + ylab("RMST Difference (Months)") + 
+  xlab("Months since Randomisation") + 
+  theme_minimal() + scale_x_continuous(breaks = c(12,24,36,48)) + 
+  scale_y_continuous(breaks = seq(from = 0, to = 1, by = 0.2))
+  
+t3
+  
+ggsave(plot = t3,
+       filename = "F:/GLP1_agonists/analysis/results/compare_models.pdf",
+       height = 5,
+       width = 8,
+       units = "in")
+
+  
+  
+
+### 
+
 
 plot <- RMSTcurves(df, time_horizons = c(12, 24, 36, 48),
            MA_mvma = F,MA_mvma_boot = F,MA_uni = T,MA_uni_flex = T)
+
+
 
 RMSTplot(plot,
          ylim = c(-0.1, 1),
@@ -99,10 +173,8 @@ legend(x = "topleft",
          "PIONEER-6"),
        fill = c("red","blue","green","orange",
                "purple","yellow","brown","gray"),
-       
        bty = "n",
-       cex = 0.8
-       )
+       cex = 0.8)
 
 # create plot using ggplot
 
@@ -154,7 +226,7 @@ ggsave(plot = a3,
 
 # code to create a continuous plot.
 
-time <- seq(from = 0, to = 48, by = 0.1)
+time <- seq(from = 0, to = 48, by = 3)
 
 cont_res <- metaRMSTD(df2, 
                  time_horizons = time,
@@ -169,11 +241,63 @@ cont_result2 <- cont_result %>% drop_na()
 glimpse(cont_result2)
 
 
-### need to work on the graph
-### add ribbon, color, axes, other details
+# graph for whole time period.
+# univariate model using KM curves.
 
-ggplot(data = cont_result2, aes(x = time_horizon, y = Estimate)) + 
+p <- ggplot(data = cont_result2, aes(x = time_horizon, y = Estimate)) + 
   geom_line() + 
-  geom_ribbon(data = cont_result2, aes(ymin = lower, ymax = upper, fill = "gray")) +
-  scale_alpha(0.2)
+  geom_line(data = cont_result2, aes(x = time_horizon, y = lower), color = "red",
+            linetype  = 2) +
+  geom_line(data = cont_result2, aes(x = time_horizon, y = upper), color = "red",
+            linetype = 2)
+            
+p2 <- p + theme_minimal()
+
+p3 <- p2 + scale_x_continuous(breaks = c(12,24,36,48)) + 
+  ylab("RMST Difference (Months)") + xlab("Months since Randomisation")
+
+
+# Wald test to compare results for sensitivity analysis.
+
+km_w <- result_univ_km %>% select(time_horizon,
+                                  Estimate,
+                                  SE)
+
+
+flex_w <- df_res %>% select(time_horizon,
+                            Estimate,
+                            SE)
+
+
+flex_w2 <- flex_w %>% rename(
+  Estimate2 = Estimate,
+  SE2 = SE
+) 
+
+table <- left_join(km_w, flex_w2, by = "time_horizon")
+
+table
+
+table$zscore =  ((table$Estimate*table$Estimate) - 
+        (table$Estimate2*table$Estimate2))/
+  sqrt((table$SE*table$SE) + (table$SE2*table$SE2))
+
+
+table$Wald_test <- 2*pnorm(-abs(table$zscore))
+
+# create a function so that can run that for the other values.
+# this function can be used for the other tests.
+
+wald_test_MA <- function(Estimate, SE, Estimate2, SE2){
+  
+  a = (Estimate*Estimate) - (Estimate2*Estimate2)
+  
+  b = sqrt((SE*SE) + (SE2*SE2))
+  
+  z = a/b
+  
+  p = 2*pnorm(-abs(z))
+  
+  return(p)
+}
 
