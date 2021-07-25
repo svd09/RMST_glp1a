@@ -108,3 +108,25 @@ t3 <- t2 + ylab("RMST Difference (Months)") +
 
 t3
 
+# Wald test for comparing subgroup analysis 
+
+
+source("wald_test_MA.R")
+
+d1 <- result_univ_km %>% select(Estimate, SE, time_horizon)
+
+d2 <- df_res %>% select(time_horizon, Estimate, SE) %>%
+  rename(
+    Estimate2 = Estimate,
+    SE2 = SE) 
+
+df <- left_join(d1, d2, by = "time_horizon")
+
+df$wald_test_p = with(df, wald_test_MA(Estimate = 
+                                         Estimate,
+                                       SE = SE,
+                                       Estimate2 = Estimate2,
+                                       SE2 = SE2
+))
+
+df
