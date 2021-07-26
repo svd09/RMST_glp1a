@@ -6,7 +6,7 @@ library(easypackages)
 
 libraries(c("tidyverse","IPDfromKM",'survival',
             "flexsurv","broom","rstpm2","survminer",
-            "metaRMST", "ggthemes"))
+            "metaRMST", "ggthemes","ckbplotr"))
 
 
 # get all the data.
@@ -300,4 +300,80 @@ wald_test_MA <- function(Estimate, SE, Estimate2, SE2){
   
   return(p)
 }
+
+# am going to plot forest plot for the 48 months estimate for this data.
+
+dfm <- res$rmstd_est %>% tbl_df()
+
+dfse <- res$se_rmstd_est %>% tbl_df()
+
+
+glimpse(dfm)
+
+glimpse(dfse)
+
+table <- tibble(
+  Study = c("Amplitude-O","ELIXA","Sustain6", 
+            "Harmony Outcomes",'EXCEL',"LEADER","REWIND","PIONEER6",
+            "Pooled Estimate"),
+  estimate = c(dfm$RMSTD_est_at_48,0.627),
+  stderr= c(dfse$se_RMSTD_est_at_48, 0.182)
+)
+
+table
+
+table$shape = rep(15, 9)
+
+table$color = rep("black",9)
+
+table$fill = rep("black",9)
+
+table$variable = c('a','b','c','d','e','f','g','h','i')
+
+table <- data.frame(table)
+
+table$row.level.labels = rep("heading",9)
+
+
+
+# now to create the forest plot 
+
+rowlabels <- data.frame(heading = rep('Study',9),
+                     variable = c('a','b','c','d','e','f','g','h','i'),
+                     row.labels.levels = rep("heading",9))
+
+
+forestplot1 <- 
+  make_forest_plot(panels = list(table),
+  col.key          = "Study",
+  row.labels       = ckbplotr_row_labels,
+#  row.labels.levels = c("heading", "subheading", "label"),
+  rows             = c("Diff RMST"),
+  exponentiate     = FALSE,
+  panel.names      = c("RMST"),
+  blankrows        = c(0, 1, 0, 1),
+  scalepoints      = TRUE,
+  pointsize        = 3,
+  shape            = "shape",
+  colour           = "colour",
+#  col.bold         = "bold",
+#  col.diamond      = "diamond",
+#  ciunder          = "ciunder"
+)
+
+
+fp1 <- make_forest_plot(
+  panels = list(table),
+  col.key = "variable",
+  row.labels = rowlabels,
+#  col.estimate = estimate,
+# col.stderr = stderr,
+  row.labels.levels = c("heading"),
+  rows = "Study",
+  exponentiate = F
+  
+)
+
+
+
 
