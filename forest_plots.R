@@ -154,8 +154,10 @@ f <- make_forest_plot(panels = list(table_12, table_24),
                       ),
                       exponentiate = F,
                       col.right.heading = "RMST Diff.(95%CI)",
+                      xlim = c(-0.2,0.4),
                       colour = "color",
-                      nullval = 0)
+                      nullval = 0,
+                      xlab = " dRMST (95% CI)    favours GLP1agonists")
 
 
 f
@@ -174,7 +176,8 @@ f2 <- make_forest_plot(panels = list(table_36, table_48),
                        exponentiate = F,
                        col.right.heading = "RMST Diff.(95%CI)",
                        colour = "color",
-                       nullval = 0)
+                       nullval = 0,
+                       xlab = "dRMST (95% CI)   favours GLP1 agonists")
 
 f2
 

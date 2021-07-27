@@ -152,8 +152,47 @@ plot <- RMSTcurves(df, time_horizons = c(12, 24, 36, 48),
            MA_mvma = F,MA_mvma_boot = F,MA_uni = T,MA_uni_flex = T)
 
 
+pdf("F:\\GLP1_agonists\\analysis\\results\\rmstplot.pdf",
+    height = 5,
+    width = 8)
+
 
 RMSTplot(plot,
+         ylim = c(-0.1, 2),
+         trial_legend = F,
+         estimates = T,
+         MA_legend = F,
+         xlim = c(0,48),
+         ylab = "RMST Difference (Months)",
+         xlab = "Months since Randomisation",
+         col = c("red","blue","green","orange",
+                 "purple","yellow","brown","gray"))
+legend(x = "topleft",
+       legend = c(
+         "AMPLITUDE-O",
+         "ELIXA",
+         "SUSTAIN-6",
+         "Harmony Outcomes",
+         "EXCSEL",
+         "LEADER",
+         "REWIND",
+         "PIONEER-6"),
+       fill = c("red","blue","green","orange",
+               "purple","yellow","brown","gray"),
+       bty = "n",
+       cex = 0.8)
+
+
+dev.off()
+
+# only km method...
+
+plot_km <- RMSTcurves(df, time_horizons = c(12, 24, 36, 48),
+        MA_mvma = F,MA_mvma_boot = F,MA_uni = T,MA_uni_flex = F)
+
+
+
+RMSTplot(plot_km,
          ylim = c(-0.1, 1),
          trial_legend = F,
          estimates = T,
@@ -172,9 +211,45 @@ legend(x = "topleft",
          "REWIND",
          "PIONEER-6"),
        fill = c("red","blue","green","orange",
-               "purple","yellow","brown","gray"),
+                "purple","yellow","brown","gray"),
        bty = "n",
        cex = 0.8)
+
+
+
+# parametric method.
+
+
+plot_rp <- RMSTcurves(df, time_horizons = c(12, 24, 36, 48),
+                      MA_mvma = F,MA_mvma_boot = F,MA_uni = F,MA_uni_flex = T)
+
+
+
+RMSTplot(plot_rp,
+         # ylim = c(-0.1, 1),
+         trial_legend = F,
+         estimates = T,
+         MA_legend = F,
+         xlim = c(0,48),
+         ylab = "RMST Difference (Months)",
+         xlab = "Months since Randomisation",)
+legend(x = "topleft",
+       legend = c(
+         "AMPLITUDE-O",
+         "ELIXA",
+         "SUSTAIN-6",
+         "Harmony Outcomes",
+         "EXCSEL",
+         "LEADER",
+         "REWIND",
+         "PIONEER-6"),
+       fill = c("red","blue","green","orange",
+                "purple","yellow","brown","gray"),
+       bty = "n",
+       cex = 0.8)
+
+
+
 
 # create plot using ggplot
 
