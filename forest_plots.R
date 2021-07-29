@@ -101,7 +101,7 @@ table_24 <- tibble(
   estimate = c(dfm$RMSTD_est_at_24,NA,0.158),
   stderr = c(dfse$se_RMSTD_est_at_24,NA, 0.0383),
   variable = c("1","2","3","4","5","6","7","8",NA,"Pooled"),
-  color = c(rep("black",8),NA,"red")
+  color = c("gray",rep("black",6),"gray",NA, "red")
 )
 
 
@@ -112,7 +112,7 @@ table_36 <- tibble(
   estimate = c(dfm$RMSTD_est_at_36,NA,0.368),
   stderr = c(dfse$se_RMSTD_est_at_36,NA, 0.0971),
   variable = c("1","2","3","4","5","6","7","8",NA,"Pooled"),
-  color = c(rep("black",8),NA,"red")
+  color = c("gray","black","gray","gray","black","black","gray","gray",NA,"red")
 )
 
 
@@ -123,7 +123,7 @@ table_48 <- tibble(
   estimate = c(dfm$RMSTD_est_at_48,NA,0.627),
   stderr = c(dfse$se_RMSTD_est_at_48,NA, 0.182),
   variable = c("1","2","3","4","5","6","7","8",NA,"Pooled"),
-  color = c(rep("black",8),NA,"red")
+  color = c("gray","gray","gray","gray","black","black","gray","gray",NA,"red")
 )
 
 rowlabels = tibble(heading = c(rep("3 point MACE",10)),
