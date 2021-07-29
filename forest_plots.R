@@ -154,7 +154,7 @@ f <- make_forest_plot(panels = list(table_12, table_24),
                       ),
                       exponentiate = F,
                       col.right.heading = "RMST Diff.(95%CI)",
-                      xlim = c(-0.2,0.4),
+                      xlim = c(-1,3),
                       colour = "color",
                       nullval = 0,
                       xlab = " dRMST (95% CI)    favours GLP1agonists")
@@ -177,6 +177,7 @@ f2 <- make_forest_plot(panels = list(table_36, table_48),
                        col.right.heading = "RMST Diff.(95%CI)",
                        colour = "color",
                        nullval = 0,
+                       xlim = c(-1,3),
                        xlab = "dRMST (95% CI)   favours GLP1 agonists")
 
 f2
@@ -197,7 +198,7 @@ mace2 <- mace + plot_annotation(
 )
 
 ggsave(mace2,
-  filename = "F:\\GLP1_agonists\\analysis\\results\\3ptmace.pdf",
+  filename = "F:\\GLP1_agonists\\analysis\\results\\3ptmace_same_axes.pdf",
   device = "pdf",
   height = 10,
   width = 10,
