@@ -6,7 +6,8 @@ library(easypackages)
 
 libraries(c("tidyverse","IPDfromKM",'survival',
             "flexsurv","broom","rstpm2","survminer",
-            "metaRMST", "ggthemes","ckbplotr"))
+            "metaRMST", "ggthemes","ckbplotr",
+            "metafor","meta"))
 
 
 # get all the data.
@@ -99,6 +100,40 @@ df_res <- tbl_df(res$result)
 result_flex <- df_res %>% select(time_horizon,Estimate,lower, upper, pval)
 
 result_flex
+
+# sensitivity analysis removing ELIXA ---
+
+df_sens <- df2 %>% filter(trialID != 2)
+
+df_sens %>% count(trialID)
+
+df_sens$trialID2 <- with(df_sens, ifelse(
+  trialID < 2, trialID, trialID -1
+))
+
+df_sens %>% count(trialID2)
+
+df_sens2 <- tibble(
+  trialID = df_sens$trialID2,
+  Time = df_sens$Time,
+  Event = df_sens$Event,
+  Arm = df_sens$Arm
+)
+
+res_sens <- metaRMSTD(df_sens2,time_horizons = c(12,24,36,48),
+                 MA_method ="uni_flex")
+
+df_re_sens <- tbl_df(res_sens$result)
+
+df_re_sens
+
+##################################
+
+# METAREGRESSION FOR ASCVD AND EST FOR EACH TRIAL
+
+##################################
+
+
 
 result_flex$method <- 'parametric_model'
 result_km$method <- 'KM integration'
@@ -449,6 +484,132 @@ fp1 <- make_forest_plot(
   
 )
 
+# HETEROGENEITY AND WEIGHTS FOR THE MODEL -
+# calculating heterogeneity and funnel plot for estimates.
 
 
+result <- res$rmstd_est %>% tbl_df()
+
+se_result <- res$se_rmstd_est %>% tbl_df()
+
+df <- tibble(est = result$RMSTD_est_at_12,
+             sei = se_result$se_RMSTD_est_at_12)
+
+glimpse(df)
+
+het_12 <- metafor::rma.uni(
+  yi = est, sei = sei, data = df,
+  measure = "MD",method = "DL")
+
+het_12$tau2
+# 
+# Random-Effects Model (k = 8; tau^2 estimator: DL)
+# 
+# tau^2 (estimated amount of total heterogeneity): 0 (SE = 0.0005)
+# tau (square root of estimated tau^2 value):      0
+# I^2 (total heterogeneity / total variability):   0.00%
+# H^2 (total variability / sampling variability):  1.00
+# 
+# Test for Heterogeneity:
+#   Q(df = 7) = 5.1911, p-val = 0.6367
+# 
+# Model Results:
+#   
+#   estimate      se    zval    pval   ci.lb   ci.ub 
+# 0.0354  0.0109  3.2560  0.0011  0.0141  0.0567  ** 
+#   
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+# heterogeneity at 24 months 
+
+df_24 <- tibble(est = result$RMSTD_est_at_24,
+             sei = se_result$se_RMSTD_est_at_24)
+
+glimpse(df_24)
+
+het_24 <- metafor::rma.uni(
+  yi = est, sei = sei, data = df_24,
+  measure = "MD",method = "DL")
+
+het_24
+
+# Random-Effects Model (k = 8; tau^2 estimator: DL)
+# 
+# tau^2 (estimated amount of total heterogeneity): 0.0029 (SE = 0.0062)
+# tau (square root of estimated tau^2 value):      0.0538
+# I^2 (total heterogeneity / total variability):   25.38%
+# H^2 (total variability / sampling variability):  1.34
+# 
+# Test for Heterogeneity:
+#   Q(df = 7) = 9.3806, p-val = 0.2265
+# 
+# Model Results:
+#   
+#   estimate      se    zval    pval   ci.lb   ci.ub 
+# 0.1583  0.0383  4.1305  <.0001  0.0832  0.2334  *** 
+#   
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+
+df_36 <- tibble(est = result$RMSTD_est_at_36,
+                sei = se_result$se_RMSTD_est_at_36)
+
+glimpse(df_36)
+
+het_36 <- metafor::rma.uni(
+  yi = est, sei = sei, data = df_36,
+  measure = "MD",method = "DL")
+
+het_36
+
+# Random-Effects Model (k = 8; tau^2 estimator: DL)
+# 
+# tau^2 (estimated amount of total heterogeneity): 0.0381 (SE = 0.0398)
+# tau (square root of estimated tau^2 value):      0.1951
+# I^2 (total heterogeneity / total variability):   54.07%
+# H^2 (total variability / sampling variability):  2.18
+# 
+# Test for Heterogeneity:
+#   Q(df = 7) = 15.2392, p-val = 0.0331
+# 
+# Model Results:
+#   
+#   estimate      se    zval    pval   ci.lb   ci.ub 
+# 0.3680  0.0971  3.7904  0.0002  0.1777  0.5583  *** 
+#   
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+df_48 <- tibble(est = result$RMSTD_est_at_48,
+                sei = se_result$se_RMSTD_est_at_48)
+
+glimpse(df_48)
+
+het_48 <- metafor::rma.uni(
+  yi = est, sei = sei, data = df_48,
+  measure = "MD",method = "DL")
+
+het_48
+
+# Random-Effects Model (k = 8; tau^2 estimator: DL)
+# 
+# tau^2 (estimated amount of total heterogeneity): 0.1444 (SE = 0.1422)
+# tau (square root of estimated tau^2 value):      0.3801
+# I^2 (total heterogeneity / total variability):   60.39%
+# H^2 (total variability / sampling variability):  2.52
+# 
+# Test for Heterogeneity:
+#   Q(df = 7) = 17.6738, p-val = 0.0135
+# 
+# Model Results:
+#   
+#   estimate      se    zval    pval   ci.lb   ci.ub 
+# 0.6268  0.1822  3.4404  0.0006  0.2697  0.9839  *** 
+#   
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 

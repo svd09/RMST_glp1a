@@ -71,6 +71,42 @@ result_flex <- df_res %>% select(time_horizon,Estimate,lower, upper, pval)
 result_flex
 
 
+# CALCULATING HETEROGENEITY FOR THE MODEL.
+
+
+result <- res_flex$rmstd_est %>% tbl_df()
+
+se_result <- res_flex$se_rmstd_est %>% tbl_df()
+
+df <- tibble(est = result$RMSTD_est_at_24,
+             sei = se_result$se_RMSTD_est_at_24)
+
+glimpse(df)
+
+het_24 <- metafor::rma.uni(
+  yi = est, sei = sei, data = df,
+  measure = "MD",method = "DL")
+
+
+het_24
+
+
+# heterogeneity 48
+
+
+df48 <- tibble(est = result$RMSTD_est_at_48,
+             sei = se_result$se_RMSTD_est_at_48)
+
+glimpse(df48)
+
+het_48 <- metafor::rma.uni(
+  yi = est, sei = sei, data = df48,
+  measure = "MD",method = "DL")
+
+
+het_48
+
+
 # plot both 
 
 

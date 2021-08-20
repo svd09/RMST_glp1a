@@ -73,30 +73,31 @@ dfse <- res_flex$se_rmstd_est %>% tbl_df()
 
 table_24 <- tibble(
   study = c("Sustain6","Harmony Outcomes","EXCSEL",
-            "LEADER","REWIND","Pioneer6", NA, "Pooled"),
-  estimate = c(dfm$RMSTD_est_at_24, NA,0.0409),
-  stderr = c(dfse$se_RMSTD_est_at_24, NA,0.0401),
-  variable = c("1","2","3","4","5","6",NA ,"Pooled"),
-  color = c(rep("black",6),NA,"red")
+            "LEADER","REWIND","Pioneer6", NA, "Pooled (RP)","Pooled (KM)"),
+  estimate = c(dfm$RMSTD_est_at_24, NA,0.0409, 0.02),
+  stderr = c(dfse$se_RMSTD_est_at_24, NA,0.0401, 0.02),
+  variable = c("1","2","3","4","5","6",NA ,"Pooled (RP)","Pooled (KM)"),
+  color = c("black","black","gray","black","gray","gray","NA","red","blue")
 )
 
 table_48 <- 
 tibble(
   study = c("Sustain6","Harmony Outcomes","EXCSEL",
-            "LEADER","REWIND","Pioneer6", NA, "Pooled"),
-  estimate = c(dfm$RMSTD_est_at_48, NA, 0.163),
-  stderr = c(dfse$se_RMSTD_est_at_48, NA, 0.140),
-  variable = c("1","2","3","4","5","6",NA ,"Pooled"),
-  color = c(rep("black",6),NA,"red")
+            "LEADER","REWIND","Pioneer6", NA, "Pooled (RP)", "Pooled (KM)"),
+  estimate = c(dfm$RMSTD_est_at_48, NA, 0.163, 0.142),
+  stderr = c(dfse$se_RMSTD_est_at_48, NA, 0.140, 0.153),
+  variable = c("1","2","3","4","5","6",NA ,"Pooled (RP)", "Pooled (KM)"),
+  color = c("gray","black","gray","black","gray","gray","NA","red","blue")
 )
 
 
 
-rowlabels = tibble(heading = c(rep("CV Mortality",8)),
-                   subheading = c(rep("Trials Included",6),NA,NA),
-                   variable = c("1","2","3","4","5","6",NA, "Pooled"),
+rowlabels = tibble(heading = c(rep("CV Mortality",9)),
+                   subheading = c(rep("Trials Included",6),NA,NA,NA),
+                   variable = c("1","2","3","4","5","6",NA, "Pooled (RP)", "Pooled (KM)"),
                    label = c("Sustain6","Harmony Outcomes","EXCSEL",
-                                     "LEADER","REWIND","Pioneer6", NA, "Pooled Estimate"))
+                                     "LEADER","REWIND","Pioneer6", NA, 
+                             "Pooled Estimate (RP)", "Pooled (KM)"))
 
 
 
@@ -152,6 +153,14 @@ df2_m <- df %>% select(trialID, Time, Event, Arm)
 
 # run the model here.
 
+# fixed model 
+
+fixed <- metaRMSTD(df2_m,
+                   time_horizons = c(24,48),
+                   MA_method ="uni")
+  
+
+
 
 res_flex_m <- metaRMSTD(df2_m,
                       time_horizons = c(24,48),
@@ -169,34 +178,34 @@ df_m_est
 df_m_se
 
 table_24_m <- tibble(
-  study = c("LEADER","EXCSEL", NA, "Pooled"),
-  estimate = c(df_m_est$RMSTD_est_at_24, NA, 0.0553),
-  stderr = c(df_m_se$se_RMSTD_est_at_24, NA, 0.0265),
-  variable = c("1","2",NA,"Pooled"),
-  color = c(rep("black",2),NA,"red")
+  study = c("LEADER","EXCSEL", NA, "Pooled (PM)", "Pooled (KM)"),
+  estimate = c(df_m_est$RMSTD_est_at_24, NA, 0.0553, 0.054),
+  stderr = c(df_m_se$se_RMSTD_est_at_24, NA, 0.0265, 0.027),
+  variable = c("1","2",NA,"Pooled (PM)", "Pooled (KM)"),
+  color = c(rep("black",2),NA,"red", "blue")
 )
 
 table_48_m <- tibble(
-  study = c("LEADER","EXCSEL", NA, "Pooled"),
-  estimate = c(df_m_est$RMSTD_est_at_48, NA, 0.261),
-  stderr = c(df_m_se$se_RMSTD_est_at_48, NA, 0.0896),
-  variable = c("1","2",NA,"Pooled"),
-  color = c(rep("black",2),NA,"red")
+  study = c("LEADER","EXCSEL", NA, "Pooled (PM)", "Pooled (KM)"),
+  estimate = c(df_m_est$RMSTD_est_at_48, NA, 0.261, 0.265),
+  stderr = c(df_m_se$se_RMSTD_est_at_48, NA, 0.0896, 0.090),
+  variable = c("1","2",NA,"Pooled (PM)", "Pooled (KM)"),
+  color = c(rep("black",2),NA,"red", "blue")
   
 )
 
 
-rowlabels_m = tibble(heading = c(rep("All cause Mortality",4)),
-                   subheading = c(rep("Trials Included",2),NA,NA),
-                   variable = c("1","2",NA, "Pooled"),
-                   label = c("LEADER", "EXCSEL", NA, "Pooled Estimate"))
+rowlabels_m = tibble(heading = c(rep("All cause Mortality",5)),
+                   subheading = c(rep("Trials Included",2),NA,NA, NA),
+                   variable = c("1","2",NA, "Pooled (PM)", "Pooled (KM)"),
+                   label = c("LEADER", "EXCSEL", NA, "Pooled Estimate (PM)", "Pooled Estimate (KM)"))
 
 
 
 
-f <- make_forest_plot(panels = list(table_24_m, table_48_m),
+f_m <- make_forest_plot(panels = list(table_24_m, table_48_m),
                       
-                      row.labels = rowlabels,
+                      row.labels = rowlabels_m,
                       col.key = "variable",
                       rows = c("All cause Mortality"),
                       row.labels.levels = c("heading","subheading",
@@ -210,7 +219,45 @@ f <- make_forest_plot(panels = list(table_24_m, table_48_m),
                       xlim = c(-0.5,0.5),
                       xlab = "dRMST(95% CI)   favours GLP1 agonist")
 
-f
+f_m
+
+#  AM GOING TO USE PATCHWORK TO COMBINE PLOTS 
+# THIS IS THE FIGURE GOING INTO THE PAPER.
+
+library(patchwork)
+
+
+mort <- f$plot/f_m$plot
+
+mort2 <- mort + plot_annotation(
+  
+  tag_levels = "A"
+)
+
+
+mort2
+
+
+
+ggsave(mort2,
+       filename = "F:\\GLP1_agonists\\analysis\\results\\mortality_comb.pdf",
+       device = "pdf",
+       height = 8,
+       width = 8,
+       units = "in")
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -223,7 +270,7 @@ t_48 <- rbind(table_48, table_48_m)
 rowlabels_c <- rbind(rowlabels, rowlabels_m)
 
 rowlabels_c$variable2 <- c("1","2","3","4","5","6",NA,"8",
-                           "9","10",NA,"12")
+                           "9","10",NA,"12","13","14")
 
 t_24$variable2 <- rowlabels_c$variable2
 

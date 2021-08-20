@@ -60,7 +60,7 @@ df2 <- df %>% select(trialID, Time, Event, Arm)
 
 
 res_uni <- metaRMSTD(df2, 
-                     time_horizons = c(12,24,36,48),
+                     time_horizons = c(24,48),
                      MA_method ="uni")
 
 res_uni
@@ -81,7 +81,7 @@ result_km
 # flexible parametric model 
 
 res_flex <- metaRMSTD(df2,
-                 time_horizons = c(12,24,36,48),
+                 time_horizons = c(24,48),
                  MA_method ="uni_flex")
 
 df_res <- tbl_df(res_flex$result)
@@ -188,3 +188,41 @@ table2$wald_test_p <- with(table2,
 
 
 table2
+
+
+# HETEROGENEITY CALCULATIONS FOR 24 / 48 MONTHS
+
+# heterogeneity for models ---
+
+
+result <- res_flex$rmstd_est %>% tbl_df()
+
+se_result <- res_flex$se_rmstd_est %>% tbl_df()
+
+df <- tibble(est = result$RMSTD_est_at_24,
+             sei = se_result$se_RMSTD_est_at_24)
+
+glimpse(df)
+
+het_24 <- metafor::rma.uni(
+  yi = est, sei = sei, data = df,
+  measure = "MD",method = "DL")
+
+het_24
+
+# 48 months 
+
+result <- res_flex$rmstd_est %>% tbl_df()
+
+se_result <- res_flex$se_rmstd_est %>% tbl_df()
+
+df <- tibble(est = result$RMSTD_est_at_48,
+             sei = se_result$se_RMSTD_est_at_48)
+
+glimpse(df)
+
+het_48 <- metafor::rma.uni(
+  yi = est, sei = sei, data = df,
+  measure = "MD",method = "DL")
+
+het_48

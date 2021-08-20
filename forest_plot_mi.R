@@ -40,6 +40,7 @@ df$Arm <- df$treat
 
 df2 <- df %>% select(trialID, Time, Event, Arm)
 
+
 # fitting the parametric model 
 
 
@@ -59,32 +60,32 @@ dfse <- res$se_rmstd_est %>% tbl_df()
 table_24 <- tibble(
   study = c("Sustain6", 
             "Harmony Outcomes","LEADER","REWIND",NA,
-            "Pooled Estimate"),
-  estimate = c(dfm$RMSTD_est_at_24,NA,0.0804),
-  stderr = c(dfse$se_RMSTD_est_at_24,NA, 0.0318),
-  variable = c("1","2","3","4",NA,"Pooled"),
-  color = c(rep("black",4),NA,"red")
+            "Pooled Estimate (PM)", "Pooled Estimate (KM)"),
+  estimate = c(dfm$RMSTD_est_at_24,NA,0.0804,0.18),
+  stderr = c(dfse$se_RMSTD_est_at_24,NA, 0.0318, 0.03),
+  variable = c("1","2","3","4",NA,"Pooled (PM)", "Pooled (KM)"),
+  color = c("black", "black", "black", "gray", "NA","red","blue")
 )
 
 
 table_48 <- tibble(
   study = c("Sustain6", 
             "Harmony Outcomes","LEADER","REWIND",NA,
-            "Pooled Estimate"),
-  estimate = c(dfm$RMSTD_est_at_48,NA,0.416),
-  stderr = c(dfse$se_RMSTD_est_at_48,NA, 0.223),
-  variable = c("1","2","3","4",NA,"Pooled"),
-  color = c(rep("black",4),NA,"red")
+            "Pooled Estimate(PM)","Pooled Estimate (KM)"),
+  estimate = c(dfm$RMSTD_est_at_48,NA,0.416, 0.19),
+  stderr = c(dfse$se_RMSTD_est_at_48,NA, 0.223, 0.1),
+  variable = c("1","2","3","4",NA,"Pooled (PM)", "Pooled (KM)"),
+  color = c("black","gray","black","gray",NA,"red","blue")
 )
 
 
-rowlabels = tibble(heading = c(rep("Myocardial Infarction",6)),
+rowlabels = tibble(heading = c(rep("Myocardial Infarction",7)),
                    subheading = c(rep("Trials Included",4),
-                                  NA, NA),
-                   variable = c("1","2","3","4",NA, "Pooled"),
+                                  NA, NA, NA),
+                   variable = c("1","2","3","4",NA, "Pooled (PM)","Pooled (KM)"),
                    label = c("Sustain6", 
                              "Harmony Outcomes","LEADER","REWIND",
-                             NA, "Pooled Estimate"))
+                             NA, "Pooled Estimate (PM)", "Pooled Estimate (KM)"))
 
 
 
@@ -119,5 +120,4 @@ ggsave(f$plot,
        device = "pdf")
 
 
-# NEED TO MAKE SOME ADJUSTMENTS AND CREATE AN ARROW ---
 

@@ -86,53 +86,53 @@ dfse <- res$se_rmstd_est %>% tbl_df()
 table_12 <- tibble(
   study = c("Amplitude-O","ELIXA","Sustain6", 
             "Harmony Outcomes",'EXCEL',"LEADER","REWIND","PIONEER6",NA,
-            "Pooled Estimate"),
-  estimate = c(dfm$RMSTD_est_at_12,NA,0.0354),
-  stderr = c(dfse$se_RMSTD_est_at_12,NA, 0.0109),
-  variable = c("1","2","3","4","5","6","7","8",NA,"Pooled"),
-  color = c(rep("black",8),NA,"red")
+            "Pooled Estimate (PM)", 'Pooled (KM)'),
+  estimate = c(dfm$RMSTD_est_at_12,NA,0.0354, 0.0346),
+  stderr = c(dfse$se_RMSTD_est_at_12,NA, 0.0109, 0.0114),
+  variable = c("1","2","3","4","5","6","7","8",NA,"Pooled (PM)", "Pooled (KM)"),
+  color = c(rep("black",8),NA,"red", "blue")
 )
 
 
 table_24 <- tibble(
   study = c("Amplitude-O","ELIXA","Sustain6", 
             "Harmony Outcomes",'EXCEL',"LEADER","REWIND","PIONEER6",NA,
-            "Pooled Estimate"),
-  estimate = c(dfm$RMSTD_est_at_24,NA,0.158),
-  stderr = c(dfse$se_RMSTD_est_at_24,NA, 0.0383),
-  variable = c("1","2","3","4","5","6","7","8",NA,"Pooled"),
-  color = c("gray",rep("black",6),"gray",NA, "red")
+            "Pooled Estimate (PM)", "Pooled (KM)"),
+  estimate = c(dfm$RMSTD_est_at_24,NA,0.158, 0.154),
+  stderr = c(dfse$se_RMSTD_est_at_24,NA, 0.0383, 0.037),
+  variable = c("1","2","3","4","5","6","7","8",NA,"Pooled (PM)", "Pooled (KM)"),
+  color = c("gray",rep("black",6),"gray",NA, "red", "blue")
 )
 
 
 table_36 <- tibble(
   study = c("Amplitude-O","ELIXA","Sustain6", 
             "Harmony Outcomes",'EXCEL',"LEADER","REWIND","PIONEER6",NA,
-            "Pooled Estimate"),
-  estimate = c(dfm$RMSTD_est_at_36,NA,0.368),
-  stderr = c(dfse$se_RMSTD_est_at_36,NA, 0.0971),
-  variable = c("1","2","3","4","5","6","7","8",NA,"Pooled"),
-  color = c("gray","black","gray","gray","black","black","gray","gray",NA,"red")
+            "Pooled Estimate (PM)", "Pooled Estimate (KM)"),
+  estimate = c(dfm$RMSTD_est_at_36,NA,0.368, 0.188),
+  stderr = c(dfse$se_RMSTD_est_at_36,NA, 0.0971, 0.0919),
+  variable = c("1","2","3","4","5","6","7","8",NA,"Pooled (PM)", "Pooled (KM)"),
+  color = c("gray","black","gray","gray","black","black","gray","gray",NA,"red", "blue")
 )
 
 
 table_48 <- tibble(
   study = c("Amplitude-O","ELIXA","Sustain6", 
             "Harmony Outcomes",'EXCEL',"LEADER","REWIND","PIONEER6",NA,
-            "Pooled Estimate"),
-  estimate = c(dfm$RMSTD_est_at_48,NA,0.627),
-  stderr = c(dfse$se_RMSTD_est_at_48,NA, 0.182),
-  variable = c("1","2","3","4","5","6","7","8",NA,"Pooled"),
-  color = c("gray","gray","gray","gray","black","black","gray","gray",NA,"red")
+            "Pooled Estimate (PM)", "Pooled Estimate (KM)"),
+  estimate = c(dfm$RMSTD_est_at_48,NA,0.627, 0.381),
+  stderr = c(dfse$se_RMSTD_est_at_48,NA, 0.182, 0.149),
+  variable = c("1","2","3","4","5","6","7","8",NA,"Pooled (PM)", "Pooled (KM)"),
+  color = c("gray","gray","gray","gray","black","black","gray","gray",NA,"red", "blue")
 )
 
-rowlabels = tibble(heading = c(rep("3 point MACE",10)),
+rowlabels = tibble(heading = c(rep("3 point MACE",11)),
                     subheading = c(rep("Trials Included",8),
-                                   NA, NA),
-                    variable = c("1","2","3","4","5","6","7","8",NA, "Pooled"),
+                                   NA, NA, NA),
+                    variable = c("1","2","3","4","5","6","7","8",NA, "Pooled (PM)", "Pooled (KM)"),
                     label = c("Amplitude-O","ELIXA","Sustain6", 
                               "Harmony Outcomes",'EXCEL',"LEADER","REWIND","PIONEER6",
-                              NA, "Pooled Estimate"))
+                              NA, "Pooled Estimate (PM)", "Pooled Estimate (KM)"))
 
 
 

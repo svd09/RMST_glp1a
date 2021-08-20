@@ -226,5 +226,177 @@ ggsave(
 
 # create plots for next figure panel 
 
+# EXCSEL
 
+kmfit_excsel <- survfit(Surv(time, status) ~ treat, 
+                         data = excsel)
 
+excsel_stpm2 <- rstpm2::stpm2(Surv(time, status) ~ treat, 
+                df = 3,tvc = list(treat = 1),  data = excsel)
+
+excsel_fit <- predict(excsel_stpm2, newdata = data.frame(treat = c(0:1)),
+                       grid = T, full = T, se.fit = T,
+                       type = "surv")
+
+excsel_fit$cif <- 1 - excsel_fit$Estimate
+
+excsel.p <- jskm::jskm(sfit = kmfit_excsel,
+                        cumhaz = T,legend = F,
+                        linecols = "black",marks = F)
+
+excsel.p
+
+excsel.p2 = excsel.p + ylim(0,0.25) 
+
+excsel.p2
+
+# convert to CIF 
+
+excsel.p3 = excsel.p2 + 
+  geom_line(data = excsel_fit, aes(x = time, y = cif, 
+                                    color = factor(treat)),
+            size = 1) +
+  labs(x = "Months since Randomisation", 
+       y = "Cumulative Incidence ") + ggtitle('EXCSEL') + 
+  theme(plot.title=element_text(hjust = 0.5, vjust = - 20))
+
+excsel.p3   
+
+# LEADER
+
+kmfit_leader <- survfit(Surv(time, status) ~ treat, 
+                        data = leader)
+
+leader_stpm2 <- rstpm2::stpm2(Surv(time, status) ~ treat, 
+                df = 3,tvc = list(treat = 1),  data = leader)
+
+leader_fit <- predict(leader_stpm2, newdata = data.frame(treat = c(0:1)),
+                      grid = T, full = T, se.fit = T,
+                      type = "surv")
+
+leader_fit$cif <- 1 - leader_fit$Estimate
+
+leader.p <- jskm::jskm(sfit = kmfit_leader,
+                       cumhaz = T,legend = F,
+                       linecols = "black",marks = F)
+
+leader.p
+
+leader.p2 = leader.p + ylim(0,0.25) 
+
+leader.p2
+
+# convert to CIF 
+
+leader.p3 = leader.p2 + 
+  geom_line(data = leader_fit, aes(x = time, y = cif, 
+                                   color = factor(treat)),
+            size = 1) +
+  labs(x = "Months since Randomisation", 
+       y = "Cumulative Incidence ") + ggtitle('LEADER') + 
+  theme(plot.title=element_text(hjust = 0.5, vjust = - 20))
+
+leader.p3 
+
+# REWIND
+
+kmfit_rewind <- survfit(Surv(time, status) ~ treat, 
+                        data = rewind)
+
+rewind_stpm2 <- rstpm2::stpm2(Surv(time, status) ~ treat, 
+                              df = 3,tvc = list(treat = 1),  
+                              data = rewind)
+
+rewind_fit <- predict(rewind_stpm2, newdata = data.frame(treat = c(0:1)),
+                      grid = T, full = T, se.fit = T,
+                      type = "surv")
+
+rewind_fit$cif <- 1 - rewind_fit$Estimate
+
+rewind.p <- jskm::jskm(sfit = kmfit_rewind,
+                       cumhaz = T,legend = F,
+                       linecols = "black",marks = F)
+
+rewind.p
+
+rewind.p2 = rewind.p + ylim(0,0.25) 
+
+rewind.p2
+
+# convert to CIF 
+
+rewind.p3 = rewind.p2 + 
+  geom_line(data = rewind_fit, aes(x = time, y = cif, 
+                                   color = factor(treat)),
+            size = 1) +
+  labs(x = "Months since Randomisation", 
+       y = "Cumulative Incidence ") + ggtitle('REWIND') + 
+  theme(plot.title=element_text(hjust = 0.5, vjust = - 20))
+
+rewind.p3 
+
+# Pioneer 6 
+
+kmfit_pioneer <- survfit(Surv(time, status) ~ treat, 
+                        data = pioneer)
+
+pioneer_stpm2 <- rstpm2::stpm2(Surv(time, status) ~ treat, 
+                              df = 3,tvc = list(treat = 1),  
+                              data = pioneer)
+
+pioneer_fit <- predict(pioneer_stpm2, newdata = data.frame(treat = c(0:1)),
+                      grid = T, full = T, se.fit = T,
+                      type = "surv")
+
+pioneer_fit$cif <- 1 - pioneer_fit$Estimate
+
+pioneer.p <- jskm::jskm(sfit = kmfit_pioneer,
+                       cumhaz = T,legend = F,
+                       linecols = "black",marks = F)
+
+pioneer.p
+
+pioneer.p2 = pioneer.p + ylim(0,0.10) 
+
+pioneer.p2
+
+# convert to CIF 
+
+pioneer.p3 = pioneer.p2 + 
+  geom_line(data = pioneer_fit, aes(x = time, y = cif, 
+                                   color = factor(treat)),
+            size = 1) +
+  labs(x = "Months since Randomisation", 
+       y = "Cumulative Incidence ") + ggtitle('Pioneer 6') + 
+  theme(plot.title=element_text(hjust = 0.5, vjust = - 20))
+
+pioneer.p3 
+
+# combine the 4 plots to present panel plot
+
+plot <- excsel.p3 + leader.p3
+
+plot
+
+plot[[2]] <- plot[[2]] + theme(axis.title.y = element_blank())
+
+plot
+
+plot2 <- rewind.p3 + pioneer.p3
+
+plot2[[2]] <- plot2[[2]] + theme(axis.title.y = element_blank())
+
+plot2
+
+plot3 <- plot/plot2
+
+plot3
+
+ggsave(
+  plot = plot3,
+  filename = "F:\\GLP1_agonists\\analysis\\results\\RPfit_4trials_panel2.pdf",
+  device = "pdf",
+  height = 5,
+  width = 8,
+  units = "in"
+)

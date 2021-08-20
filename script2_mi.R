@@ -146,3 +146,64 @@ df$wald_test_p = with(df, wald_test_MA(Estimate =
                               ))
 
 df
+
+
+# heterogeneity for models ---
+
+
+result <- res$rmstd_est %>% tbl_df()
+
+se_result <- res$se_rmstd_est %>% tbl_df()
+
+df <- tibble(est = result$RMSTD_est_at_24,
+             sei = se_result$se_RMSTD_est_at_24)
+
+glimpse(df)
+
+het_24 <- metafor::rma.uni(
+  yi = est, sei = sei, data = df,
+  measure = "MD",method = "DL")
+
+het_24
+
+# Random-Effects Model (k = 4; tau^2 estimator: DL)
+# 
+# tau^2 (estimated amount of total heterogeneity): 0 (SE = 0.0038)
+# tau (square root of estimated tau^2 value):      0
+# I^2 (total heterogeneity / total variability):   0.00%
+# H^2 (total variability / sampling variability):  1.00
+# 
+# Test for Heterogeneity:
+#   Q(df = 3) = 2.3366, p-val = 0.5055
+# 
+# Model Results:
+#   
+#   estimate      se    zval    pval   ci.lb   ci.ub 
+# 0.0804  0.0318  2.5249  0.0116  0.0180  0.1428  
+
+df_48 <- tibble(est = result$RMSTD_est_at_48,
+             sei = se_result$se_RMSTD_est_at_48)
+
+glimpse(df_48)
+
+het_48 <- metafor::rma.uni(
+  yi = est, sei = sei, data = df_48,
+  measure = "MD",method = "DL")
+
+het_48
+
+# Random-Effects Model (k = 4; tau^2 estimator: DL)
+# 
+# tau^2 (estimated amount of total heterogeneity): 0.1216 (SE = 0.1543)
+# tau (square root of estimated tau^2 value):      0.3487
+# I^2 (total heterogeneity / total variability):   75.40%
+# H^2 (total variability / sampling variability):  4.06
+# 
+# Test for Heterogeneity:
+#   Q(df = 3) = 12.1937, p-val = 0.0067
+# 
+# Model Results:
+#   
+#   estimate      se    zval    pval    ci.lb   ci.ub 
+# 0.4157  0.2231  1.8633  0.0624  -0.0216  0.8529  
+
