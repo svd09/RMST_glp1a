@@ -35,7 +35,7 @@ if(length(new.packages)){
 
 for(n in 1:n_packages){
   cat("Loading Library #", n, "of", n_packages, "...currently loading: ", packages[n], "\n", sep = "")
-  lib.load <- paste("library(\"", packages[n], "\")", sep = "")
+  lib_load <- paste("library(\"", packages[n], "\")", sep = "")
   eval(parse(text = lib_load))
 }
 
@@ -106,3 +106,16 @@ res48 = metafor::rma.uni(yi = logHR, sei = se, data = df48,
 summary(res48)
 
 
+# combining results 
+
+
+time = c(12, 24, 36, 48)
+est = c(-0.1646, -0.1716, -0.0747,-0.1147 )
+lci = c(-0.2433 , -0.2619 , -0.1776 , -0.1883 )
+uci = c(-0.0859, -0.0813 , 0.0281,  -0.0411)
+
+df = data.frame(time, HR = exp(est), Lower = exp(lci), 
+            Upper = exp(uci)) %>% tbl_df()
+
+
+df
