@@ -1,5 +1,5 @@
 
-![](https://img.shields.io/badge/-Under%20Development-blue.svg)
+![](https://img.shields.io/badge/-Published-blue.svg)
 
 # RMST_glp1a
 
