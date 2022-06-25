@@ -9,4 +9,4 @@ create figures presented in the manuscript.
 
 The manuscript is published in the journal "Diabetes Obesity and Metabolism".
 
-![](https://dom-pubs.onlinelibrary.wiley.com/doi/10.1111/dom.14738)
+[https://dom-pubs.onlinelibrary.wiley.com/doi/10.1111/dom.14738]
